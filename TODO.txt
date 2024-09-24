@@ -1,0 +1,9 @@
+--fEITO--
+
+CRUD ACCOUNT e TRANSACTIONS
+
+--TO DO--
+
+Relacionamento entre transaction e account
+
+Alteração do salário
