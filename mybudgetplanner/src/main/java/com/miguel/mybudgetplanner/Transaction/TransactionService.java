@@ -28,7 +28,10 @@ public class TransactionService {
     }*/
 
     public Transaction findById(Integer id) {
-        return transactionRepository.findById(id).orElse(null);
+        return transactionRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new RuntimeException("Transaction not found with ID: " + id));
     }
 
     public Transaction create(Transaction transaction) {

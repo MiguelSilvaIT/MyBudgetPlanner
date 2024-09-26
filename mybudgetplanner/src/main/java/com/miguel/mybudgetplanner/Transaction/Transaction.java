@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.miguel.mybudgetplanner.Account.Account;
 import com.miguel.mybudgetplanner.Transaction.enums.Frequency;
 import com.miguel.mybudgetplanner.Transaction.enums.TransactionType;
+import com.miguel.mybudgetplanner.category.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -52,6 +53,10 @@ public class Transaction {
     @NotNull(message = "Account is mandatory")
     @JsonBackReference
     private Account account;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
 
 }

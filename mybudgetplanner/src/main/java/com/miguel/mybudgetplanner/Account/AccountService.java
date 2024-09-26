@@ -1,5 +1,6 @@
 package com.miguel.mybudgetplanner.Account;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -7,34 +8,35 @@ import java.util.List;
 @Service
 public class AccountService {
 
-    private final AccountRepositorie accountRepositorie;
+    @Autowired
+    private final AccountRepository accountRepository;
 
-    public AccountService(AccountRepositorie accountRepositorie) {
-        this.accountRepositorie = accountRepositorie;
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
     public Account createAccount(Account account) {
-        return accountRepositorie.save(account);
+        return accountRepository.save(account);
     }
 
     public Account getAccountById(Integer id) {
-        return accountRepositorie.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
+        return accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
     }
 
     public Account updateAccount(Account account, Integer id) {
-        Account accountToUpdate = accountRepositorie.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
+        Account accountToUpdate = accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
         accountToUpdate.setAccountName(account.getAccountName());
         accountToUpdate.setBalance(account.getBalance());
-        return accountRepositorie.save(accountToUpdate);
+        return accountRepository.save(accountToUpdate);
     }
 
     public void deleteAccount(Integer id) {
-        accountRepositorie.deleteById(id);
+        accountRepository.deleteById(id);
     }
 
 
 
     public List<Account> getAllAccounts() {
-        return accountRepositorie.findAll();
+        return accountRepository.findAll();
     }
 }

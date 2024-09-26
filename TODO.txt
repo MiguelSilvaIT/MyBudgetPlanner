@@ -2,8 +2,23 @@
 
 CRUD ACCOUNT e TRANSACTIONS
 
---TO DO--
-
 Relacionamento entre transaction e account
 
 Alteração do salário
+
+--TO DO--
+
+
+    Testes Unitários e de Integração - Garante a qualidade do projeto desde o início.
+
+    Gestão de Orçamentos (Budgets) - Adiciona funcionalidade que simula lógica de negócio real.
+
+    Integração com API de Taxas de Câmbio - Mostra experiência na integração de serviços de terceiros.
+
+    Exportação de Dados - Mostra habilidade na manipulação e geração de relatórios.
+
+    Autenticação e Autorização Avançada - Demonstra conhecimentos avançados de segurança.
+
+    Relatórios e Dashboards - Adiciona uma camada de visualização, que impressiona os potenciais empregadores.
+
+    Documentação com Swagger - Finaliza o projeto com uma documentação profissional.

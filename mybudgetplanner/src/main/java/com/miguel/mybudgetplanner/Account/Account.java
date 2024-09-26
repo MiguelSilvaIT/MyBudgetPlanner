@@ -1,23 +1,20 @@
 package com.miguel.mybudgetplanner.Account;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.miguel.mybudgetplanner.Transaction.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+
+
 
 public class Account {
     @Id
@@ -35,6 +32,19 @@ public class Account {
     @JsonManagedReference
     private List<Transaction> transactions;
 
+    public Account() {
+    }
 
+    public Account(String accountName, BigDecimal balance) {
+        this.accountName = accountName;
+        this.balance = balance;
+    }
+
+    public Account(Integer id, String accountName, BigDecimal balance, List<Transaction> transactions) {
+        this.id = id;
+        this.accountName = accountName;
+        this.balance = balance;
+        this.transactions = transactions;
+    }
 }
 
