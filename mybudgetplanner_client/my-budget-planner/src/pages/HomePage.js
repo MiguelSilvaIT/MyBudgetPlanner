@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => (
   <div style={{ padding: '20px', textAlign: 'center' }}>
-    <h1>Welcome to Budget Planner</h1>
+    <h1>Welcome to My Budget Planner</h1>
     <Link to="/login">
       <button>Login</button>
     </Link>

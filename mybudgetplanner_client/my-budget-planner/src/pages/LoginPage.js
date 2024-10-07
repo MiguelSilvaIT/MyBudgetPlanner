@@ -1,19 +1,24 @@
 // src/pages/LoginPage.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/authService';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const response = await axios.post('http://localhost:8080/api/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token); // Guardar o token de autenticação
-      window.location.href = '/dashboard';
-    } catch (error) {
-      alert('Invalid credentials');
+      await login(email, password);
+      alert('Login successful!');
+      navigate('/dashboard'); // Redirecionar para a página de destino após o login
+    } catch (errorMessages) {
+      setError(errorMessages.join(' '));
     }
   };
 
@@ -39,6 +44,11 @@ const LoginPage = () => {
         <br />
         <button type="submit">Login</button>
       </form>
+      {error && (
+        <div style={{ color: 'red', marginTop: '10px' }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 };

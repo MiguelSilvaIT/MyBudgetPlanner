@@ -7,11 +7,14 @@ const RegisterPage = () => {
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessages, setErrorMessages] = useState([]); // Adicionado para armazenar mensagens de erro
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessages([]); // Limpar mensagens de erro antes do novo pedido
+
     try {
-      await axios.post('http://localhost:8080/api/auth/register', {
+      await axios.post('http://localhost:8080/api/v1/auth/register', {
         firstname,
         lastname,
         email,
@@ -19,7 +22,12 @@ const RegisterPage = () => {
       });
       window.location.href = '/login';
     } catch (error) {
-      alert('Registration failed');
+      // Verifica se há uma resposta do backend
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrorMessages(error.response.data.errors); // Armazenar as mensagens de erro recebidas do backend
+      } else {
+        setErrorMessages(['Registration failed. Please try again later.']); // Mensagem genérica de erro
+      }
     }
   };
 
@@ -61,6 +69,17 @@ const RegisterPage = () => {
         <br />
         <button type="submit">Register</button>
       </form>
+
+      {/* Exibir mensagens de erro */}
+      {errorMessages.length > 0 && (
+        <div style={{ color: 'red', marginTop: '10px' }}>
+          <ul>
+            {errorMessages.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

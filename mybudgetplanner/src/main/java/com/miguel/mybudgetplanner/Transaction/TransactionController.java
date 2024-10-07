@@ -2,9 +2,11 @@ package com.miguel.mybudgetplanner.Transaction;
 
 import com.miguel.mybudgetplanner.response.ApiResponse;
 import com.miguel.mybudgetplanner.response.ResponseUtil;
+import com.miguel.mybudgetplanner.user.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,10 +24,22 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Transaction>>> findAll(HttpServletRequest request) {
-        List<Transaction> transactions = transactionService.findAll();
-        ApiResponse<List<Transaction>> response = ResponseUtil.success(transactions, "Transactions retrieved successfully", request.getRequestURI());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<List<Transaction>>> getTransactions(Authentication authentication) {
+        // Obter o usuário logado através da autenticação
+        User loggedUser = (User) authentication.getPrincipal();
+
+        // Buscar as transações do usuário logado
+        List<Transaction> transactions = transactionService.findAllById(loggedUser.getId());
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Transactions retrieved successfully",
+                transactions,
+                null,
+                0,
+                System.currentTimeMillis(),
+                "/api/transactions"
+        ));
     }
 
     @GetMapping("/{id}")

@@ -24,20 +24,22 @@ public class UserRepositoryTest {
     @Test
     void shouldSaveUserSuccessfully() {
         // Given
-        User user = User.builder()
-                .firstname("John")
-                .lastname("Doe")
-                .email("john.doe@example.com")
-                .password("password123")
-                .role(Role.USER)
-                .build();
+        User user = new User(
+                1,
+                "John",
+                "Doe",
+                "john@mail.pt",
+                "password123",
+                Role.USER,
+                null
+        );
 
         // When
         User savedUser = userRepository.save(user);
 
         // Then
         assertNotNull(savedUser.getId());
-        assertEquals("john.doe@example.com", savedUser.getEmail());
+        assertEquals("john@mail.pt", savedUser.getEmail());
         assertEquals(Role.USER, savedUser.getRole());
     }
 

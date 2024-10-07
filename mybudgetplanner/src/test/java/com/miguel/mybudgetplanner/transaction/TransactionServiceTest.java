@@ -9,6 +9,7 @@ import com.miguel.mybudgetplanner.Transaction.enums.Frequency;
 import com.miguel.mybudgetplanner.Transaction.enums.TransactionType;
 import com.miguel.mybudgetplanner.category.Category;
 import com.miguel.mybudgetplanner.category.CategoryRepositoryTest;
+import com.miguel.mybudgetplanner.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -34,15 +35,22 @@ public class TransactionServiceTest {
     @InjectMocks
     private TransactionService transactionService;
 
+    private User user;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        user = new User(); // Criar um utilizador de exemplo para associar as contas
+        user.setId(1);
+        user.setFirstname("John");
+        user.setLastname("Doe");
+        user.setEmail("john.doe@example.com");
     }
 
     @Test
     public void should_successfully_save_a_transaction() {
 
-        Account existingAccount = new Account(1, "Main Account", BigDecimal.valueOf(1000), null);
+        Account existingAccount = new Account(1, "Main Account", BigDecimal.valueOf(1000), null, user);
         // Given
         Transaction transaction = new Transaction();
         transaction.setCreatedDate(LocalDate.now());
@@ -148,7 +156,7 @@ public class TransactionServiceTest {
     @Test
     public void should_delete_transaction() {
 
-        Account existingAccount = new Account(1, "Main Account", BigDecimal.valueOf(1000), null);
+        Account existingAccount = new Account(1, "Main Account", BigDecimal.valueOf(1000), null, user);
 
 
         // Given

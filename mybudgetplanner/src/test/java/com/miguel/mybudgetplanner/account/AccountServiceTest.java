@@ -3,10 +3,11 @@ package com.miguel.mybudgetplanner.account;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
 import com.miguel.mybudgetplanner.Account.Account;
 import com.miguel.mybudgetplanner.Account.AccountRepository;
 import com.miguel.mybudgetplanner.Account.AccountService;
+import com.miguel.mybudgetplanner.user.User;
+import com.miguel.mybudgetplanner.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,9 +27,19 @@ class AccountServiceTest {
     @Mock
     private AccountRepository accountRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
+    private User user;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        user = new User(); // Criar um utilizador de exemplo para associar as contas
+        user.setId(1);
+        user.setFirstname("John");
+        user.setLastname("Doe");
+        user.setEmail("john.doe@example.com");
     }
 
     @Test
@@ -37,23 +48,26 @@ class AccountServiceTest {
         Account account = new Account();
         account.setAccountName("Savings Account");
         account.setBalance(BigDecimal.valueOf(1000));
-
-
+        account.setUser(user); // Associar a conta ao utilizador
 
         Account savedAccount = new Account();
         savedAccount.setId(1);
         savedAccount.setAccountName("Savings Account");
         savedAccount.setBalance(BigDecimal.valueOf(1000));
+        savedAccount.setUser(user);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         when(accountRepository.save(account)).thenReturn(savedAccount);
 
         // When
-        Account result = accountService.createAccount(account);
+        Account result = accountService.createAccountForUser(user.getId(), account);
 
         // Then
         assertNotNull(result);
         assertEquals("Savings Account", result.getAccountName());
         assertEquals(BigDecimal.valueOf(1000), result.getBalance());
+        assertEquals(user, result.getUser());
         verify(accountRepository, times(1)).save(account);
     }
 
@@ -61,7 +75,11 @@ class AccountServiceTest {
     void shouldReturnAccountWhenIdExists() {
         // Given
         Integer accountId = 1;
-        Account account = new Account( "Main Account", BigDecimal.valueOf(2000));
+        Account account = new Account();
+        account.setId(accountId);
+        account.setAccountName("Main Account");
+        account.setBalance(BigDecimal.valueOf(2000));
+        account.setUser(user);
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
@@ -71,6 +89,7 @@ class AccountServiceTest {
         // Then
         assertNotNull(result);
         assertEquals("Main Account", result.getAccountName());
+        assertEquals(user, result.getUser());
         verify(accountRepository, times(1)).findById(accountId);
     }
 
@@ -90,8 +109,8 @@ class AccountServiceTest {
     void shouldUpdateAccountSuccessfully() {
         // Given
         Integer accountId = 1;
-        Account existingAccount = new Account(accountId, "Old Account", BigDecimal.valueOf(500), null);
-        Account updatedAccount = new Account(accountId, "Updated Account", BigDecimal.valueOf(1500), null);
+        Account existingAccount = new Account(accountId, "Old Account", BigDecimal.valueOf(500), null,user);
+        Account updatedAccount = new Account(accountId, "Updated Account", BigDecimal.valueOf(1500), null ,user);
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(existingAccount));
         when(accountRepository.save(existingAccount)).thenReturn(updatedAccount);
@@ -101,8 +120,9 @@ class AccountServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(updatedAccount.getAccountName(), result.getAccountName());
+        assertEquals("Updated Account", result.getAccountName());
         assertEquals(BigDecimal.valueOf(1500), result.getBalance());
+        assertEquals(user, result.getUser());
         verify(accountRepository, times(1)).findById(accountId);
         verify(accountRepository, times(1)).save(existingAccount);
     }
@@ -123,21 +143,22 @@ class AccountServiceTest {
     }
 
     @Test
-    void shouldReturnAllAccounts() {
+    void shouldReturnAllAccountsForUser() {
         // Given
         List<Account> accounts = Arrays.asList(
-                new Account(1, "Savings Account", BigDecimal.valueOf(1000), null),
-                new Account(2, "Investment Account", BigDecimal.valueOf(2000), null)
+                new Account(1, "Savings Account", BigDecimal.valueOf(1000), null ,user),
+                new Account(2, "Investment Account", BigDecimal.valueOf(2000), null ,user)
         );
 
-        when(accountRepository.findAll()).thenReturn(accounts);
+        when(accountRepository.findAllByUserId(user.getId())).thenReturn(accounts);
 
         // When
-        List<Account> result = accountService.getAllAccounts();
+        List<Account> result = accountService.getAccountsByUserId(user.getId());
 
         // Then
         assertNotNull(result);
         assertEquals(accounts.size(), result.size());
-        verify(accountRepository, times(1)).findAll();
+        assertEquals(user, result.get(0).getUser());
+        verify(accountRepository, times(1)).findAllByUserId(user.getId());
     }
 }

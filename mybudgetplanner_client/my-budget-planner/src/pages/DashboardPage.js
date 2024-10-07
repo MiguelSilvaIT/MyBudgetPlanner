@@ -1,49 +1,72 @@
-// src/pages/DashboardPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import AccountsTable from '../components/AccountsTable'; // Componente para exibir contas
+import ErrorMessage from '../components/ErrorMessage'; // Componente para mensagens de erro
+import './DashboardPage.css'; // Arquivo CSS para estilos
 
 const DashboardPage = () => {
-  const [transactions, setTransactions] = useState([]);
+  const [accounts, setAccounts] = useState([]); // Para armazenar as contas
+  const [totalBalance, setTotalBalance] = useState(0); // Saldo total
+  const [firstname, setFirstname] = useState(''); // Nome do usuário
+  const [error, setError] = useState(''); // Armazenar mensagens de erro
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:8080/api/transactions', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTransactions(response.data);
+        
+        if (!token) {
+          throw new Error('Authentication token not found. Please log in.');
+        }
+
+        // Fazer as requisições para buscar as informações do usuário e suas contas
+        const [userResponse, accountsResponse] = await Promise.all([
+          axios.get('http://localhost:8080/api/users/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get('http://localhost:8080/api/accounts/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        ]);
+
+        // Configurar o nome e saldo total do usuário
+        if (userResponse.data?.data) {
+          setFirstname(userResponse.data.data.firstname);
+          setTotalBalance(userResponse.data.data.totalBalance);
+        }
+
+        // Configurar as contas do usuário
+        if (accountsResponse.data?.data) {
+          setAccounts(accountsResponse.data.data);
+        }
+
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching dashboard data:', error.message);
+        setError(error.message || 'Failed to load dashboard data.');
       }
     };
 
-    fetchTransactions();
+    fetchDashboardData();
   }, []);
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Dashboard</h2>
-      <table border="1" style={{ margin: 'auto', width: '80%' }}>
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Value</th>
-            <th>Date</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.description}</td>
-              <td>{transaction.value}</td>
-              <td>{transaction.createdDate}</td>
-              <td>{transaction.type}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="dashboard-container">
+      <h2>Welcome, {firstname}!</h2>
+
+      {/* Exibir saldo total */}
+      <div className="balance-info">
+        Total Balance: <strong>${totalBalance.toFixed(2)}</strong>
+      </div>
+
+      {/* Exibir mensagem de erro */}
+      {error && <ErrorMessage message={error} />}
+
+      {/* Exibir contas ou mensagem de vazio */}
+      {accounts.length === 0 && !error ? (
+        <div className="no-accounts">You currently have no accounts.</div>
+      ) : (
+        <AccountsTable accounts={accounts} /> // Mostrar a tabela de contas
+      )}
     </div>
   );
 };

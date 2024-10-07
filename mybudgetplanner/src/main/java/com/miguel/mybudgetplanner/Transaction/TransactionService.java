@@ -6,6 +6,7 @@ import com.miguel.mybudgetplanner.Transaction.enums.TransactionType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -21,6 +22,10 @@ public class TransactionService {
 
     public List<Transaction> findAll() {
         return transactionRepository.findAll();
+    }
+
+    public List<Transaction> findAllById(Integer id) {
+        return transactionRepository.findAllById(Collections.singleton(id));
     }
 
     /*public List<Transaction> findByType(TransactionType type) {

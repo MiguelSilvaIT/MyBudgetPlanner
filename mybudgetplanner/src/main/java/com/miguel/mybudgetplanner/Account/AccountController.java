@@ -2,12 +2,16 @@ package com.miguel.mybudgetplanner.Account;
 
 import com.miguel.mybudgetplanner.response.ApiResponse;
 import com.miguel.mybudgetplanner.response.ResponseUtil;
+import com.miguel.mybudgetplanner.user.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -20,10 +24,26 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Account>> createAccount(@Valid @RequestBody Account account, HttpServletRequest request) {
-        Account createdAccount = accountService.createAccount(account);
-        ApiResponse<Account> response = ResponseUtil.success(createdAccount, "Account created successfully", request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<Account> createAccount(Authentication authentication, @RequestBody Account account) {
+        // Recuperar o ID do utilizador autenticado a partir do token
+        Integer userId = ((User) authentication.getPrincipal()).getId();
+        Account createdAccount = accountService.createAccountForUser(userId, account);
+        return ResponseEntity.ok(createdAccount);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<Account>>> getAccountsForAuthenticatedUser(Authentication authentication) {
+        List<Account> accounts = accountService.getAccountsByAuthenticatedUser(authentication);
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Accounts retrieved successfully",
+                accounts,
+                null,
+                0,
+                System.currentTimeMillis(),
+                "/api/accounts/me"
+        ));
     }
 
     @GetMapping("/{id}")
@@ -51,6 +71,15 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Account>>> getAllAccounts(HttpServletRequest request) {
         List<Account> accounts = accountService.getAllAccounts();
+        ApiResponse<List<Account>> response = ResponseUtil.success(accounts, "Accounts retrieved successfully", request.getRequestURI());
+        return ResponseEntity.ok(response);
+    }
+
+    // Endpoint para obter todas as contas de um utilizador
+    @GetMapping("/user")
+    public ResponseEntity<ApiResponse<List<Account>>> getAccountsByUserId(Authentication authentication, HttpServletRequest request) {
+        Integer userId = ((User) authentication.getPrincipal()).getId();
+        List<Account> accounts = accountService.getAccountsByUserId(userId);
         ApiResponse<List<Account>> response = ResponseUtil.success(accounts, "Accounts retrieved successfully", request.getRequestURI());
         return ResponseEntity.ok(response);
     }

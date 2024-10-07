@@ -1,7 +1,9 @@
 package com.miguel.mybudgetplanner.Account;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.miguel.mybudgetplanner.Transaction.Transaction;
+import com.miguel.mybudgetplanner.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +34,11 @@ public class Account {
     @JsonManagedReference
     private List<Transaction> transactions;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference // Prevenir recursividade na serialização JSON
+    private User user;
+
     public Account() {
     }
 
@@ -40,11 +47,12 @@ public class Account {
         this.balance = balance;
     }
 
-    public Account(Integer id, String accountName, BigDecimal balance, List<Transaction> transactions) {
+    public Account(Integer id, String accountName, BigDecimal balance, List<Transaction> transactions, User user) {
         this.id = id;
         this.accountName = accountName;
         this.balance = balance;
         this.transactions = transactions;
+        this.user = user;
     }
 }
 

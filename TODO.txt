@@ -1,15 +1,12 @@
 --fEITO--
 
-CRUD ACCOUNT e TRANSACTIONS
+Frontend com as contas e qnt de transações por conta
 
-Relacionamento entre transaction e account
-
-Alteração do salário
 
 --TO DO--
 
 
-    Testes Unitários e de Integração - Garante a qualidade do projeto desde o início.
+
 
     Gestão de Orçamentos (Budgets) - Adiciona funcionalidade que simula lógica de negócio real.
 
